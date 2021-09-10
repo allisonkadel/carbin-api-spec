@@ -1,0 +1,624 @@
+openapi: 3.1.0
+info:
+  title: Carbon Insights
+  version: '1.0'
+  description: ''
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/businesses/{uuid}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: uuid
+        in: path
+        required: true
+    patch:
+      summary: Update a Business Profile
+      operationId: ''
+      responses:
+        '200':
+          description: Business Profile Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+              examples:
+                example-1:
+                  value:
+                    uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
+                    renewable_energy: 0
+                    recs_purchases: 0
+                    offsets_purchases: 0
+                    zip_code: string
+                    industry: string
+                    num_offices: 0
+                    total_square_feet: 0
+                    diet: omnivore
+                    fuel_grade: regular
+                    auto_offset_purchasing: false
+        '404':
+          description: Business Profile Not Found
+      description: Update the an existing business profile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Business'
+            examples:
+              example-1:
+                value:
+                  renewable_energy: 0
+                  recs_purchases: 0
+                  offsets_purchases: 0
+                  zip_code: string
+                  industry: string
+                  num_offices: 0
+                  total_square_feet: 0
+                  diet: omnivore
+                  fuel_grade: regular
+                  auto_offset_purchasing: false
+        description: Patch business profile properties to update.
+    get:
+      summary: View a business profile
+      operationId: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+              examples:
+                example-1:
+                  value:
+                    uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
+                    renewable_energy: 0
+                    recs_purchases: 0
+                    offsets_purchases: 0
+                    zip_code: string
+                    industry: string
+                    num_offices: 0
+                    total_square_feet: 0
+                    diet: omnivore
+                    fuel_grade: regular
+                    auto_offset_purchasing: false
+      description: Returns an existing business's profile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+  /calculate:
+    post:
+      summary: Calculate a carbon footprint
+      operationId: post-calculate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  footprint:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        '[category]':
+                          type: array
+                          description: key name is based on categories sent in request
+                          items:
+                            type: object
+                            properties:
+                              co2e-emissions:
+                                type: number
+                              land-use:
+                                type: number
+                              water-use:
+                                type: number
+                        co2e-emissions:
+                          type: number
+                        land-use:
+                          type: number
+                        water-use:
+                          type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Transaction'
+                aggregate:
+                  type: boolean
+                  default: true
+                  description: 'can be set to true for up to 10,000 (or x) transactions'
+        description: ''
+    parameters: []
+  /currencies:
+    get:
+      summary: View list of supported currencies
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currency_codes:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                example-1:
+                  value:
+                    currency_codes:
+                      - USD
+      operationId: get-currencies
+      description: Returns a list of the currently supported currencies.
+  /countries:
+    get:
+      summary: View list of supported countries
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  country_codes:
+                    type: array
+                    items:
+                      type: string
+              examples:
+                example-1:
+                  value:
+                    country_codes:
+                      - USA
+      operationId: get-countries
+      description: Returns list of supported countries.
+  '/businesses/{uuid}/calculate':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: uuid
+        in: path
+        required: true
+    post:
+      summary: Calculate a footprint for an existing business
+      operationId: post-businesses-id-calculate
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  footprint:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          description: Category of the transactions. Returned if `aggregate` is `true`. Can be one of the supported transaction categories or a valid MCC code.
+                          type: string
+                        co2e_emissions:
+                          type: number
+                          description: Carbon Dioxide Equivalent emissions (Tonnes) per transaction.
+                        transaction_id:
+                          type: string
+                          format: uuid
+                          description: The unique id for the transaction sent in the request. Returned if `aggregate` is `false`.
+                  climate_score:
+                    type: integer
+                    description: '[WIP definition]'
+                  total_co2e_emissions:
+                    type: number
+                    description: Carbon Dioxide Equivalent emissions (Tonnes) across all transactions.
+              examples:
+                aggregated response:
+                  value:
+                    footprint:
+                      - category: Air Travel
+                        co2e-emissions: 0.00364
+                      - category: Hotel
+                        co2e-emissions: 0.00364
+                      - total_co2e_emissions: 0.00728
+                    climate_score: 87
+                non-aggregated response:
+                  value:
+                    footprint:
+                      - transaction_id: 39847hfd83
+                        co2e-emissions: 0.003885494
+                      - transaction_id: 3847dddsh83
+                        co2e-emissions: 0.0038854545494
+                      - total_co2e_emissions: 0.0077709485494
+                    climate_score: 54
+            application/xml:
+              schema:
+                type: object
+                properties:
+                  footprint:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        '':
+                          type: string
+            multipart/form-data:
+              schema:
+                type: object
+                properties: {}
+            text/html:
+              schema:
+                type: object
+                properties: {}
+            text/plain:
+              schema:
+                type: object
+                properties: {}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactions:
+                  type: array
+                  description: Used to calculate footprint when not querying previously saved transactions (when not using the `date_range` parameter)
+                  items:
+                    $ref: '#/components/schemas/Transaction'
+                date_range:
+                  type: string
+                  format: duration
+                  description: The date range you want transactions for to be used in the calculation. Used to query previously saved transactions (when not passing data in the `transactions` parameter)
+                climate_score:
+                  type: integer
+                  default: false
+                  description: '[WIP definition]'
+                aggregate:
+                  type: boolean
+                  default: true
+                  description: 'Whether to have the response footprint data organized by category. Can be set to `true` for up to 10,000 (or x) transactions'
+            examples:
+              example-1:
+                value:
+                  transactions:
+                    - uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
+                      amount: string
+                      category: string
+                      date: '2019-08-24'
+                      transactor_id: string
+                      zip_code: string
+                      country_code: string
+                      currency_code: string
+                  date_range: string
+        description: 'To calculate the footprint, either set the `date_range` parameter to query previously saved transactions or the `transactions` parameter to pass transaction data in the request body.'
+      description: Returns a footprint and optional climate score.
+  '/businesses/{uuid}/transactions':
+    parameters:
+      - schema:
+          type: string
+        name: uuid
+        in: path
+        required: true
+    post:
+      summary: Create a business transaction
+      operationId: post-businesses-id-transactions
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+      description: Creates one or more transactions for an existing business.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Transaction'
+  /businesses:
+    post:
+      summary: Create a business profile
+      operationId: post-businesses
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    format: uuid
+              examples:
+                example-1:
+                  value:
+                    uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
+      description: Creates a business profile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Business'
+            examples:
+              example-1:
+                value:
+                  renewable_energy: 0
+                  recs_purchases: 0
+                  offsets_purchases: 0
+                  zip_code: string
+                  industry: string
+                  num_offices: 0
+                  total_square_feet: 0
+                  diet: omnivore
+                  fuel_grade: regular
+                  auto_offset_purchasing: false
+  /offsetProjects:
+    get:
+      summary: View currently available offset projects
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    offset_project:
+                      $ref: '#/components/schemas/OffsetProject'
+                    total_cost:
+                      type: number
+                      description: Cost to offset - Only returned if `co2e-emissions` parameter provided in request
+      operationId: get-offsetProjects
+      description: Returns a list of currently available offset projects
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                co2e-emissions:
+                  type: number
+                  description: 'Amount to offset. If omitted, response will not return calculated purhcase price.'
+  /purchaseOffset:
+    post:
+      summary: 'Load an offset purchase page [WIP]'
+      operationId: post-checkout
+      responses:
+        '200':
+          description: Returns a url to Stripe-hosted Checkout page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkout-url:
+                    type: string
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+          headers: {}
+      description: Creates a Stripe checkout session and loads a Stripe checkout page to purchase offsets
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactor_id:
+                  type: string
+                  format: uuid
+                  description: The uuid of the entity completing the offset purchase.
+                amount:
+                  type: number
+                  description: 'format: currency'
+                offset_project_id:
+                  type: string
+                  format: uuid
+                  description: Uuid of offset project to be purchased from.
+                success_url:
+                  type: string
+                  description: The path to redirect to in the case of a payment success.
+                failure_url:
+                  type: string
+                  description: The path to redirect to in the case of a payment failure.
+              required:
+                - transactor_id
+                - amount
+                - offset_project_id
+                - success_url
+                - failure_url
+    parameters: []
+  /merchantCategories:
+    get:
+      summary: 'View a list of supported merchant categories [WIP]'
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consumer-categories:
+                    description: Supported transaction category codes for consumer transactions.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category_name:
+                          type: string
+                        category_code:
+                          type: string
+                  business-categories:
+                    type: array
+                    description: Supported transaction category codes for business transactions.
+                    items:
+                      type: object
+                      properties:
+                        category_name:
+                          type: string
+                        category_code:
+                          type: string
+                  mcc:
+                    type: array
+                    description: Supported merchant category codes.
+                    items:
+                      type: string
+              examples:
+                example-1:
+                  value:
+                    consumer-categories:
+                      - category_name: string
+                        category_code: string
+                    business-categories:
+                      - category_name: string
+                        category_code: string
+                    mcc:
+                      - string
+      operationId: get-merchantCategories
+      description: Returns a list of supported merchant categories.
+components:
+  schemas:
+    Business:
+      title: Business
+      type: object
+      description: ''
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: ''
+          readOnly: true
+        renewable_energy:
+          type: number
+          description: '[WIP] Percentage of energy used that is renewable.'
+        recs_purchases:
+          type: number
+          description: '[WIP] The amount of RECS purchased by the business.'
+        offsets_purchases:
+          type: number
+          description: '[WIP] The amount of offsets purchased by the business.'
+        zip_code:
+          type: string
+          description: The location of the business.
+        industry:
+          type: string
+          description: The industry in which the business operates.
+        num_offices:
+          type: integer
+          description: The number of offices for the business.
+        total_square_feet:
+          type: number
+          description: The total area in square feet of the business's offices.
+        diet:
+          type: string
+          enum:
+            - omnivore
+            - vegetarian
+            - vegan
+          default: omnivore
+          description: 'The dietary habits of business members, if applicable.'
+        fuel_grade:
+          type: string
+          enum:
+            - regular
+            - mid_grade
+            - premium
+            - diesel
+          default: regular
+          description: 'The fuel grade of any cars used for the business, if applicable.'
+        auto_offset_purchasing:
+          type: boolean
+          default: false
+          description: Whether to automatically enroll business in automated periodic offset purhcases
+    Transaction:
+      title: Transaction
+      type: object
+      description: ''
+      examples: []
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: A unique identifier assigned to the transaction for later reference.
+        amount:
+          type: number
+          description: 'The transaction amount. Note: negative amounts are treated as refunds and have negative emissions associated with them.'
+        category:
+          type: string
+          description: The transaction category. Can be Merchant Category Code (MCC) or one of supported transaction categories.
+        date:
+          type: string
+          format: date
+          description: The transaction date.
+        transactor_id:
+          type: string
+          description: The owner of the transaction.
+          readOnly: true
+        currency_code:
+          type: string
+          description: The ISO 4217 Alpha-3 code of the currency of the transaction amount.
+        vendor:
+          type: string
+          description: The vendor of the transaction.
+      required:
+        - uuid
+        - amount
+        - category
+        - currency_code
+    OffsetProject:
+      title: OffsetProject
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        offset_provider_id:
+          type: string
+        max_amount:
+          type: number
+          description: The maximum amount available for purchase
+        price:
+          type: number
+        description:
+          type: string
+        country:
+          type: string
+        currency:
+          type: string
+  responses:
+    footprint:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: string
