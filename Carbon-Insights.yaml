@@ -18,8 +18,8 @@ paths:
       summary: Update a Business Profile
       operationId: ''
       responses:
-        '200':
-          description: Business Profile Updated
+        '204':
+          description: No Content
           content:
             application/json:
               schema:
@@ -92,6 +92,13 @@ paths:
               type: object
               properties: {}
         description: ''
+    delete:
+      summary: Delete a Business Profile
+      operationId: delete-businesses-uuid
+      responses:
+        '204':
+          description: No Content
+      description: Deletes the profile of an existing business.
   /calculate:
     post:
       summary: Calculate a carbon footprint
