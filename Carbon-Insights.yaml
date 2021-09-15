@@ -231,22 +231,22 @@ paths:
                     description: Carbon Dioxide Equivalent emissions (Tonnes) across all transactions.
               examples:
                 aggregated response:
-                  value:
+                  data:
                     footprint:
                       - category: Air Travel
                         co2e-emissions: 0.00364
                       - category: Hotel
                         co2e-emissions: 0.00364
-                      - total_co2e_emissions: 0.00728
+                    total_co2e_emissions: 0.00728
                     climate_score: 87
                 non-aggregated response:
-                  value:
+                  data:
                     footprint:
                       - transaction_id: 39847hfd83
                         co2e-emissions: 0.003885494
                       - transaction_id: 3847dddsh83
                         co2e-emissions: 0.0038854545494
-                      - total_co2e_emissions: 0.0077709485494
+                    total_co2e_emissions: 0.0077709485494
                     climate_score: 54
             application/xml:
               schema:
@@ -336,6 +336,7 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/Transaction'
+            examples: {}
   /businesses:
     post:
       summary: Create a business profile
@@ -585,6 +586,9 @@ components:
         currency_code:
           type: string
           description: The ISO 4217 Alpha-3 code of the currency of the transaction amount.
+        country_code:
+          type: string
+          description: The ISO 3166 Alpha-3 code of the country of the transaction.
         vendor:
           type: string
           description: The vendor of the transaction.
@@ -593,6 +597,7 @@ components:
         - amount
         - category
         - currency_code
+        - country_code
     OffsetProject:
       title: OffsetProject
       type: object
