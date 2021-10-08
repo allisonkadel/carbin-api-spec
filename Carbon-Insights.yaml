@@ -18,29 +18,16 @@ paths:
       summary: Update a Business Profile
       operationId: ''
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Business'
-              examples:
-                example-1:
-                  value:
-                    uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
-                    renewable_energy: 0
-                    recs_purchases: 0
-                    offsets_purchases: 0
-                    zip_code: string
-                    industry: string
-                    num_offices: 0
-                    total_square_feet: 0
-                    diet: omnivore
-                    fuel_grade: regular
-                    auto_offset_purchasing: false
+              examples: {}
         '404':
           description: Business Profile Not Found
-      description: Update the an existing business profile.
+      description: Updates one or more parameters of an existing business profile.
       requestBody:
         content:
           application/json:
@@ -59,7 +46,7 @@ paths:
                   diet: omnivore
                   fuel_grade: regular
                   auto_offset_purchasing: false
-        description: Patch business profile properties to update.
+        description: Can update one or more properties.
     get:
       summary: View a business profile
       operationId: ''
@@ -85,13 +72,6 @@ paths:
                     fuel_grade: regular
                     auto_offset_purchasing: false
       description: Returns an existing business's profile.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: {}
-        description: ''
     delete:
       summary: Delete a Business Profile
       operationId: delete-businesses-uuid
@@ -116,34 +96,22 @@ paths:
                     items:
                       type: object
                       properties:
-                        '[category]':
-                          type: array
+                        category:
+                          type: string
                           description: key name is based on categories sent in request
-                          items:
-                            type: object
-                            properties:
-                              carbon_equivalent_kg:
-                                type: number
-                              land_use_sq_km:
-                                type: number
-                              water_use_gal:
-                                type: number
-                        total_carbon_equivalent_kg:
+                        carbon_equivalent_kg:
                           type: number
-                        total_land_use_sq_km:
+                        land_use_sq_km:
                           type: number
-                        total_water_use_gal:
+                        water_use_gal:
                           type: number
-              examples:
-                example-1:
-                  footprint:
-                    - '[category]':
-                        - carbon_equivalent_kg: 0
-                          land_use_sq_km: 0
-                          water_use_gal: 0
-                      total_carbon_equivalent_kg: 0
-                      total_land_use_sq_km: 0
-                      total_water_use_gal: 0
+                  total_carbon_equivalent_kg:
+                    type: number
+                  total_land_use_sq_km:
+                    type: number
+                  total_water_use_gal:
+                    type: number
+              examples: {}
       requestBody:
         content:
           application/json:
@@ -172,18 +140,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  currency_codes:
-                    type: array
-                    items:
-                      type: string
-              examples:
-                example-1:
-                  value:
-                    currency_codes:
-                      - USD
-                      - AUS
+                type: array
+                items:
+                  $ref: '#/components/schemas/Currency'
+              examples: {}
       operationId: get-currencies
       description: Returns a list of the currently supported currencies.
   /countries:
@@ -196,17 +156,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  country_codes:
-                    type: array
-                    items:
-                      type: string
-              examples:
-                example-1:
-                  value:
-                    country_codes:
-                      - USA
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+              examples: {}
       operationId: get-countries
       description: Returns list of supported countries.
   '/businesses/{uuid}/footprint':
@@ -292,6 +245,8 @@ paths:
                 type: object
                 properties: {}
           headers: {}
+        '404':
+          description: Business Not Found
         '':
           description: ''
       requestBody:
@@ -317,19 +272,7 @@ paths:
                   type: boolean
                   default: true
                   description: 'Whether to have the response footprint data organized by category. Can be set to `true` for up to 10,000 (or x) transactions'
-            examples:
-              example-1:
-                value:
-                  transactions:
-                    - uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
-                      amount: string
-                      category: string
-                      date: '2019-08-24'
-                      transactor_id: string
-                      zip_code: string
-                      country_code: string
-                      currency_code: string
-                  date_range: string
+            examples: {}
         description: 'To calculate the footprint, either set the `date_range` parameter to query previously saved transactions or the `transactions` parameter to pass transaction data in the request body.'
       description: 'Returns a footprint and optional climate score. Does not create a resource available for access at `GET /businesses/{uuid}/footprint/{footprint_id}`.'
   '/businesses/{uuid}/transactions':
@@ -362,16 +305,7 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/Transaction'
-            examples:
-              example-1:
-                - uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
-                  amount: 0
-                  category: string
-                  date: '2019-08-24'
-                  transactor_id: string
-                  currency_code: string
-                  country_code: string
-                  vendor: string
+            examples: {}
   /businesses:
     post:
       summary: Create a business profile
@@ -383,40 +317,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Business'
-              examples:
-                example-1:
-                  uuid: 095be615-a8ad-4c33-8e9c-c7612fbf6c9f
-                  renewable_energy: 0
-                  rec_purchases: 0
-                  offset_purchases: 0
-                  zip_code: string
-                  industry: string
-                  num_offices: 0
-                  total_square_feet: 0
-                  diet: omnivore
-                  fuel_grade: regular
-                  auto_offset_purchasing: false
+              examples: {}
       description: Creates a business profile.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Business'
-            examples:
-              example-1:
-                value:
-                  renewable_energy: 0
-                  rec_purchases: 0
-                  offsets_purchases: 0
-                  zip_code: string
-                  industry: string
-                  num_offices: 0
-                  total_square_feet: 0
-                  diet: omnivore
-                  fuel_grade: regular
-                  auto_offset_purchasing: false
+            examples: {}
     get:
-      summary: '[wip] View business profiles'
+      summary: View business profiles
       operationId: get-businesses
       responses:
         '200':
@@ -427,7 +337,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Business'
+              examples: {}
       description: Returns a list of existing business profiles
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: industry
+          description: The industry of the businesses
+        - schema:
+            type: integer
+          in: query
+          name: limit
+        - schema:
+            type: integer
+          in: query
+          name: offset
   '/offsetProjects/{uuid}/checkout':
     post:
       summary: Create an Offset checkout session
@@ -440,7 +365,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  checkout-url:
+                  checkout_url:
                     type: string
             application/xml:
               schema:
@@ -487,7 +412,7 @@ paths:
         name: uuid
         in: path
         required: true
-  /merchantCategories:
+  /transactionCategories:
     get:
       summary: View a list of supported transaction categories
       tags: []
@@ -497,41 +422,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  consumer_categories:
-                    description: Supported transaction category codes for consumer transactions.
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        category_name:
-                          type: string
-                        category_code:
-                          type: string
-                  business_categories:
-                    type: array
-                    description: Supported transaction category codes for business transactions.
-                    items:
-                      type: object
-                      properties:
-                        category_name:
-                          type: string
-                        category_code:
-                          type: string
-                  mcc_categories:
-                    type: array
-                    description: Supported merchant category codes.
-                    items:
-                      type: object
-                      properties:
-                        category_description:
-                          type: string
-                        category_code:
-                          type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
               examples: {}
       operationId: get-merchantCategories
       description: Returns a list of supported transaction categories.
+    parameters: []
   '/businesses/{uuid}/revenues/{revenue_id}':
     parameters:
       - schema:
@@ -554,12 +451,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Revenue'
-              examples:
-                example-1:
-                  currency_code: string
-                  date_from: '2019-08-24'
-                  amount: 0
-                  business_id: f59fcbb7-848d-4242-af07-a8bb7e3ab37c
+              examples: {}
         '404':
           description: Business Not Found
       description: Creates one or more revenues for an existing business
@@ -574,8 +466,12 @@ paths:
       summary: Update a business revenue
       operationId: patch-businesses-uuid-revenues
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Revenue'
         '404':
           description: Business or Revenue Not Found
       description: Updates one or more parameters of a business revenue
@@ -633,8 +529,12 @@ paths:
       summary: Update a business transaction
       operationId: patch-businesses-uuid-transactions-transaction_id
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
         '404':
           description: Business or Transaction Not Found
       description: Updates one or more parameters of a transaction for an existing business
@@ -658,7 +558,20 @@ paths:
     get:
       summary: View currently available offset projects
       tags: []
-      responses: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    offset_project:
+                      $ref: '#/components/schemas/OffsetProject'
+                    total_cost:
+                      type: number
       operationId: get-offsetProjects
       parameters:
         - schema:
@@ -666,21 +579,45 @@ paths:
           in: query
           name: carbon_equivalent_kg
           description: 'Amount to offset. If omitted, response will not return calculated purhcase price.'
+      description: Returns a list of currently available offset projects
+  /offsetEstimates:
+    post:
+      summary: Estimate the offset price for a carbon footprint
+      operationId: post-offsetEstimates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offset_project_id:
+                    type: string
+                    format: uuid
+                  cost:
+                    type: number
+                    description: 'The cost to offset the footprint, in USD.'
+                  currency_code:
+                    type: string
+                    description: The ISO 4217 Alpha-3 currency code of the `cost`.
       requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  offset_project:
-                    $ref: '#/components/schemas/OffsetProject'
-                  total_cost:
-                    type: number
-                    description: Cost to offset - Only returned if `co2e-emissions` parameter provided in request
-            examples: {}
-      description: Returns a list of currently available offset projects
+              type: object
+              properties:
+                offset_project_id:
+                  type: string
+                  format: uuid
+                  description: Optional project to select to calculate cost to offset. Will default to preferred project if none is provided.
+                carbon_equivalent_kg:
+                  type: number
+                  description: The amount to offset used in the price estimation.
+                currency_code:
+                  type: string
+                  description: The ISO 4217 Alpha-3 currency code to be used in the cost estimation.
+      description: 'Returns an estimate for the cost of offseting a carbon footprint. Does not create a resource available at `/offsetEstimates/{id}`.'
 components:
   schemas:
     Business:
@@ -770,6 +707,9 @@ components:
           description: The vendor of the transaction.
         zip_code:
           type: string
+        business_id:
+          type: string
+          format: uuid
       required:
         - amount
         - category
@@ -803,7 +743,11 @@ components:
     Revenue:
       title: Revenue
       type: object
-      examples: []
+      examples:
+        - currency_code: string
+          date_from: '2019-08-24'
+          amount: 0
+          business_id: f59fcbb7-848d-4242-af07-a8bb7e3ab37c
       description: ''
       properties:
         currency_code:
@@ -812,7 +756,7 @@ components:
         date_from:
           type: string
           format: date
-          description: The start date of the reported revenue `amount`. (wip - could also be date_to)
+          description: The ISO 8601 start date of the reported revenue `amount`.
         amount:
           type: number
           description: The revenue amount since the `date_from`.
@@ -824,12 +768,74 @@ components:
         - currency_code
         - date_from
         - amount
-  responses:
-    footprint:
-      description: Example response
-      content:
-        application/json:
-          schema:
-            properties:
-              id:
-                type: string
+    Currency:
+      title: Currency
+      type: object
+      properties:
+        code:
+          type: string
+          description: ISO 4217 Alpha-3 currency code
+        name:
+          type: string
+          description: Currency name
+    Country:
+      title: Country
+      type: object
+      properties:
+        code:
+          type: string
+          description: ISO 3166 Alpha-3 country code
+        name:
+          type: string
+          description: Country name
+    Category:
+      title: TransactionCategory
+      type: object
+      properties:
+        type_name:
+          type: string
+          description: 'Category type. Consumer, Business, or MCC.'
+        code:
+          type: string
+          description: Category code of the transaction
+        description:
+          type: string
+          description: Description or name of the category
+    OffsetPurchase:
+      title: OffsetPurchase
+      type: object
+      properties:
+        offset_project_id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency_code:
+          type: string
+        '':
+          type: string
+    OffsetProvider:
+      title: OffsetProvider
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+    Commitment:
+      title: Commitment
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        commited:
+          type: string
+        achieved:
+          type: string
+  responses: {}
